@@ -1,0 +1,4 @@
+.env
+logs/video*
+logs/VQE*
+firebase.sa.key.json
