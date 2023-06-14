@@ -2,6 +2,7 @@ package services
 
 import (
 	"github.com/Video-Quality-Enhancement/VQE-User-API/internal/models"
+	"github.com/Video-Quality-Enhancement/VQE-User-API/internal/producers"
 	"github.com/Video-Quality-Enhancement/VQE-User-API/internal/repositories"
 	"golang.org/x/exp/slog"
 )
@@ -20,11 +21,13 @@ type UserService interface {
 
 type userService struct {
 	userRepository repositories.UserRepository
+	producer       producers.WelcomeProducer
 }
 
-func NewUserService(userRepository repositories.UserRepository) UserService {
+func NewUserService(userRepository repositories.UserRepository, producer producers.WelcomeProducer) UserService {
 	return &userService{
 		userRepository: userRepository,
+		producer:       producer,
 	}
 }
 
@@ -37,6 +40,14 @@ func (s *userService) UpsertUser(userId string) (bool, error) {
 	if err != nil {
 		slog.Error("Failed to upsert user", "error", err, "userId", userId)
 		return false, err
+	}
+
+	if isUpserted {
+		err := s.producer.Publish(userId)
+		if err != nil {
+			slog.Error("Failed to publish welcome message", "error", err, "userId", userId)
+			return false, err
+		}
 	}
 
 	slog.Debug("Upserted user", "userId", userId, "isUpserted", isUpserted)
