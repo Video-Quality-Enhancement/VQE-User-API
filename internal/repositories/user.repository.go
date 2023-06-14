@@ -12,7 +12,7 @@ import (
 )
 
 type UserRepository interface {
-	UpsertUser(user *models.User) error
+	Upsert(user *models.User) (bool, error)
 	FindByUserId(userId string) (*models.User, error)
 	UpdateWhatsAppNumber(userId string, whatsAppNumber string) error
 	UpdateDiscordId(userId string, discordId string) error
@@ -33,7 +33,7 @@ func NewUserRepository(collection *mongo.Collection) UserRepository {
 	}
 }
 
-func (r *userRepository) UpsertUser(user *models.User) error {
+func (r *userRepository) Upsert(user *models.User) (bool, error) {
 	now := time.Now().UTC()
 	user.CreatedAt = now
 	user.UpdatedAt = now
@@ -55,12 +55,17 @@ func (r *userRepository) UpsertUser(user *models.User) error {
 	updatedResult, err := r.collection.UpdateOne(ctx, filter, update, opts)
 
 	if err != nil {
-		slog.Error("Failed to upsert user", "error", err, "userId", user.UserId)
-		return err
+		slog.Error("Failed to upsert", "error", err, "userId", user.UserId)
+		return false, err
 	}
 
-	slog.Debug("Upserted user", "userId", user.UserId, "updatedResult", updatedResult)
-	return nil
+	slog.Debug("Upserted", "userId", user.UserId, "updatedResult", updatedResult)
+
+	if updatedResult.UpsertedCount == 1 {
+		return true, nil
+	}
+
+	return false, nil
 }
 
 func (r *userRepository) FindByUserId(userId string) (*models.User, error) {
@@ -245,11 +250,11 @@ func (r *userRepository) Delete(userId string) error {
 	deletedResult, err := r.collection.DeleteOne(ctx, filter)
 
 	if err != nil {
-		slog.Error("Failed to delete user", "error", err, "userId", userId)
+		slog.Error("Failed to delete", "error", err, "userId", userId)
 		return err
 	}
 
-	slog.Debug("Deleted user", "userId", userId, "deletedResult", deletedResult)
+	slog.Debug("Deleted", "userId", userId, "deletedResult", deletedResult)
 	return nil
 
 }
