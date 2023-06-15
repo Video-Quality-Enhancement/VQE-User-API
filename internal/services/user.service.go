@@ -9,13 +9,27 @@ import (
 
 type UserService interface {
 	UpsertUser(userId string) (bool, error)
+
 	GetUser(userId string) (*models.User, error)
+
 	EditWhatsAppNumber(userId string, whatsAppNumber string) error
+	GetWhatsAppNumber(userId string) (string, error)
+
 	EditDiscordId(userId string, discordId string) error
+	GetDiscordId(userId string) (string, error)
+
 	EditTelegramNumber(userId string, telegramNumber string) error
+	GetTelegramNumber(userId string) (string, error)
+
 	EditNotificationInterfaces(userId string, notificationInterfaces []string) error
+	GetNotificationInterfaces(userId string) ([]string, error)
+
 	EditFCMtokens(userId string, FCMtokens []string) error
+	GetFCMtokens(userId string) ([]string, error)
+
 	EditWebhooks(userId string, webhooks []string) error
+	GetWebhooks(userId string) ([]string, error)
+
 	DeleteUser(userId string) error
 }
 
@@ -59,11 +73,11 @@ func (s *userService) GetUser(userId string) (*models.User, error) {
 
 	user, err := s.userRepository.FindByUserId(userId)
 	if err != nil {
-		slog.Error("Failed to get user by userId", "error", err, "userId", userId)
+		slog.Error("Failed to get user", "error", err, "userId", userId)
 		return nil, err
 	}
 
-	slog.Debug("Got user by userId", "userId", userId)
+	slog.Debug("Got user", "userId", userId)
 	return user, nil
 
 }
@@ -81,6 +95,19 @@ func (s *userService) EditWhatsAppNumber(userId string, whatsAppNumber string) e
 
 }
 
+func (s *userService) GetWhatsAppNumber(userId string) (string, error) {
+
+	whatsAppNumber, err := s.userRepository.FindWhatsAppNumber(userId)
+	if err != nil {
+		slog.Error("Failed to get WhatsApp number", "error", err, "userId", userId)
+		return "", err
+	}
+
+	slog.Debug("Got WhatsApp number", "userId", userId)
+	return whatsAppNumber, nil
+
+}
+
 func (s *userService) EditDiscordId(userId string, discordId string) error {
 
 	err := s.userRepository.UpdateDiscordId(userId, discordId)
@@ -91,6 +118,19 @@ func (s *userService) EditDiscordId(userId string, discordId string) error {
 
 	slog.Debug("Edited Discord ID", "userId", userId, "discordId", discordId)
 	return nil
+
+}
+
+func (s *userService) GetDiscordId(userId string) (string, error) {
+
+	discordId, err := s.userRepository.FindDiscordId(userId)
+	if err != nil {
+		slog.Error("Failed to get Discord ID", "error", err, "userId", userId)
+		return "", err
+	}
+
+	slog.Debug("Got Discord ID", "userId", userId)
+	return discordId, nil
 
 }
 
@@ -107,16 +147,42 @@ func (s *userService) EditTelegramNumber(userId string, telegramNumber string) e
 
 }
 
+func (s *userService) GetTelegramNumber(userId string) (string, error) {
+
+	telegramNumber, err := s.userRepository.FindTelegramNumber(userId)
+	if err != nil {
+		slog.Error("Failed to get Telegram number", "error", err, "userId", userId)
+		return "", err
+	}
+
+	slog.Debug("Got Telegram number", "userId", userId)
+	return telegramNumber, nil
+
+}
+
 func (s *userService) EditNotificationInterfaces(userId string, notificationInterfaces []string) error {
 
 	err := s.userRepository.UpdateNotificationInterfaces(userId, notificationInterfaces)
 	if err != nil {
-		slog.Error("Failed to edit Telegram number", "error", err, "userId", userId, "notificationInterfaces", notificationInterfaces)
+		slog.Error("Failed to edit notification Interfaces", "error", err, "userId", userId, "notificationInterfaces", notificationInterfaces)
 		return err
 	}
 
-	slog.Debug("Edited Telegram number", "userId", userId, "notificationInterfaces", notificationInterfaces)
+	slog.Debug("Edited notification Interfaces", "userId", userId, "notificationInterfaces", notificationInterfaces)
 	return nil
+
+}
+
+func (s *userService) GetNotificationInterfaces(userId string) ([]string, error) {
+
+	notificationInterfaces, err := s.userRepository.FindNotificationInterfaces(userId)
+	if err != nil {
+		slog.Error("Failed to get notification Interfaces", "error", err, "userId", userId)
+		return nil, err
+	}
+
+	slog.Debug("Got notification Interfaces", "userId", userId)
+	return notificationInterfaces, nil
 
 }
 
@@ -133,16 +199,42 @@ func (s *userService) EditFCMtokens(userId string, FCMtokens []string) error {
 
 }
 
+func (s *userService) GetFCMtokens(userId string) ([]string, error) {
+
+	FCMtokens, err := s.userRepository.FindFCMtokens(userId)
+	if err != nil {
+		slog.Error("Failed to get FCM tokens", "error", err, "userId", userId)
+		return nil, err
+	}
+
+	slog.Debug("Got FCM tokens", "userId", userId)
+	return FCMtokens, nil
+
+}
+
 func (s *userService) EditWebhooks(userId string, webhooks []string) error {
 
 	err := s.userRepository.UpdateWebhooks(userId, webhooks)
 	if err != nil {
-		slog.Error("Failed to edit Telegram number", "error", err, "userId", userId, "webhooks", webhooks)
+		slog.Error("Failed to edit Webhooks", "error", err, "userId", userId, "webhooks", webhooks)
 		return err
 	}
 
-	slog.Debug("Edited Telegram number", "userId", userId, "webhooks", webhooks)
+	slog.Debug("Edited Webhooks", "userId", userId, "webhooks", webhooks)
 	return nil
+
+}
+
+func (s *userService) GetWebhooks(userId string) ([]string, error) {
+
+	webhooks, err := s.userRepository.FindWebhooks(userId)
+	if err != nil {
+		slog.Error("Failed to get Webhooks", "error", err, "userId", userId)
+		return nil, err
+	}
+
+	slog.Debug("Got Webhooks", "userId", userId)
+	return webhooks, nil
 
 }
 
