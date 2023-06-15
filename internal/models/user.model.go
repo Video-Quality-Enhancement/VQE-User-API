@@ -4,12 +4,12 @@ import "time"
 
 type User struct {
 	UserId                 string    `json:"userId" bson:"userId"`
-	NotificationInterfaces []string  `json:"notificationInterfaces" bson:"notificationInterfaces"`
-	FCMtokens              []string  `json:"FCMtokens" bson:"FCMtokens"`
-	WhatsAppNumber         string    `json:"whatsAppNumber" bson:"whatsAppNumber"`
-	DiscordId              string    `json:"discordId" bson:"discordId"`
-	TelegramNumber         string    `json:"telegramNumber" bson:"telegramNumber"`
-	Webhooks               []string  `json:"webhooks" bson:"webhooks"`
+	NotificationInterfaces []string  `json:"notificationInterfaces,omitempty" bson:"notificationInterfaces,omitempty"`
+	FCMtokens              []string  `json:"FCMtokens,omitempty" bson:"FCMtokens,omitempty"`
+	WhatsAppNumber         string    `json:"whatsAppNumber,omitempty" bson:"whatsAppNumber,omitempty"`
+	DiscordId              string    `json:"discordId,omitempty" bson:"discordId,omitempty"`
+	TelegramNumber         string    `json:"telegramNumber,omitempty" bson:"telegramNumber,omitempty"`
+	Webhooks               []string  `json:"webhooks,omitempty" bson:"webhooks,omitempty"`
 	CreatedAt              time.Time `json:"createdAt" bson:"createdAt"`
 	UpdatedAt              time.Time `json:"updatedAt" bson:"updatedAt"`
 }
