@@ -18,4 +18,27 @@ func RegisterUserRoutes(router *gin.RouterGroup, authorization gin.HandlerFunc, 
 	router.Use(authorization)
 	router.GET("/test", testController)
 
+	router.PUT("/", controller.UpsertUser)
+	router.GET("/", controller.GetUser)
+
+	router.PUT("/whatsapp", controller.EditWhatsAppNumber)
+	router.GET("/whatsapp", controller.GetWhatsAppNumber)
+
+	router.PUT("/discord", controller.EditDiscordId)
+	router.GET("/discord", controller.GetDiscordId)
+
+	router.PUT("/telegram", controller.EditTelegramNumber)
+	router.GET("/telegram", controller.GetTelegramNumber)
+
+	router.PUT("/notificationInterfaces", controller.EditNotificationInterfaces)
+	router.GET("/notificationInterfaces", controller.GetNotificationInterfaces)
+
+	router.PUT("/fcmTokens", controller.EditFCMtokens)
+	router.GET("/fcmTokens", controller.GetFCMtokens)
+
+	router.PUT("/webhooks", controller.EditWebhooks)
+	router.GET("/webhooks", controller.GetWebhooks)
+
+	router.DELETE("/", controller.DeleteUser)
+
 }
