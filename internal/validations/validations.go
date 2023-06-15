@@ -8,5 +8,6 @@ import (
 func RegisterUserValidations() {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		v.RegisterValidation("are-notification-interfaces-valid", ValidateNotificationInterfaces)
+		v.RegisterValidation("are-webhooks-valid", ValidateWebhooks)
 	}
 }

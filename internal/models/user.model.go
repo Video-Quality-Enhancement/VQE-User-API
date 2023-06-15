@@ -35,5 +35,5 @@ type FCMtokensRequest struct {
 }
 
 type WebhooksRequest struct {
-	Webhooks []string `json:"webhooks" bson:"webhooks" binding:"required,url[]"`
+	Webhooks []string `json:"webhooks" bson:"webhooks" binding:"required,are-webhooks-valid"`
 }
