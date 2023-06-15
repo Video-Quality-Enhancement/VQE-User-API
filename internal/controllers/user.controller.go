@@ -25,7 +25,8 @@ type UserController interface {
 	EditNotificationInterfaces(c *gin.Context)
 	GetNotificationInterfaces(c *gin.Context)
 
-	EditFCMtokens(c *gin.Context)
+	AddFCMtoken(c *gin.Context)
+	DeleteFCMtoken(c *gin.Context)
 	GetFCMtokens(c *gin.Context)
 
 	EditWebhooks(c *gin.Context)
@@ -245,21 +246,44 @@ func (controller *userController) GetNotificationInterfaces(c *gin.Context) {
 
 }
 
-func (controller *userController) EditFCMtokens(c *gin.Context) {
+func (controller *userController) AddFCMtoken(c *gin.Context) {
 	userId, err := utils.GetUserId(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	var fcmTokensRequest models.FCMtokensRequest
+	var fcmTokensRequest models.FCMtokenRequest
 	err = c.ShouldBindJSON(&fcmTokensRequest)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err = controller.userService.EditFCMtokens(userId, fcmTokensRequest.FCMtokens)
+	err = controller.userService.AddFCMtoken(userId, fcmTokensRequest.FCMtoken)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, fcmTokensRequest)
+}
+
+func (controller *userController) DeleteFCMtoken(c *gin.Context) {
+	userId, err := utils.GetUserId(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var fcmTokensRequest models.FCMtokenRequest
+	err = c.ShouldBindJSON(&fcmTokensRequest)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = controller.userService.DeleteFCMtoken(userId, fcmTokensRequest.FCMtoken)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

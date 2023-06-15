@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/Video-Quality-Enhancement/VQE-User-API/internal/constants"
 	"github.com/Video-Quality-Enhancement/VQE-User-API/internal/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -28,7 +29,8 @@ type UserRepository interface {
 	UpdateNotificationInterfaces(userId string, notificationInterfaces []string) error
 	FindNotificationInterfaces(userId string) ([]string, error)
 
-	UpdateFCMtokens(userId string, FCMtokens []string) error
+	InsertFCMtoken(userId string, FCMtoken string) error
+	RemoveFCMtoken(userId string, FCMtoken string) error
 	FindFCMtokens(userId string) ([]string, error)
 
 	UpdateWebhooks(userId string, webhooks []string) error
@@ -69,9 +71,10 @@ func (r *userRepository) Upsert(user *models.User) (bool, error) {
 	update := bson.D{{
 		Key: "$set",
 		Value: bson.M{
-			"userId":    user.UserId,
-			"createdAt": user.CreatedAt,
-			"updatedAt": user.UpdatedAt,
+			"userId":                 user.UserId,
+			"notificationInterfaces": user.NotificationInterfaces,
+			"createdAt":              user.CreatedAt,
+			"updatedAt":              user.UpdatedAt,
 		},
 	}}
 	opts := options.Update().SetUpsert(true)
@@ -116,13 +119,21 @@ func (r *userRepository) UpdateWhatsAppNumber(userId string, whatsAppNumber stri
 	defer cancel()
 
 	filter := bson.M{"userId": userId}
-	update := bson.D{{
-		Key: "$set",
-		Value: bson.M{
-			"whatsAppNumber": whatsAppNumber,
-			"updatedAt":      time.Now().UTC(),
+	update := bson.D{
+		{
+			Key: "$set",
+			Value: bson.M{
+				"whatsAppNumber": whatsAppNumber,
+				"updatedAt":      time.Now().UTC(),
+			},
 		},
-	}}
+		{
+			Key: "$addToSet",
+			Value: bson.M{
+				"notificationInterfaces": constants.WhatsApp.String(),
+			},
+		},
+	}
 
 	updatedResult, err := r.collection.UpdateOne(ctx, filter, update)
 
@@ -160,13 +171,21 @@ func (r *userRepository) UpdateDiscordId(userId string, discordId string) error 
 	defer cancel()
 
 	filter := bson.M{"userId": userId}
-	update := bson.D{{
-		Key: "$set",
-		Value: bson.M{
-			"discordId": discordId,
-			"updatedAt": time.Now().UTC(),
+	update := bson.D{
+		{
+			Key: "$set",
+			Value: bson.M{
+				"discordId": discordId,
+				"updatedAt": time.Now().UTC(),
+			},
 		},
-	}}
+		{
+			Key: "$addToSet",
+			Value: bson.M{
+				"notificationInterfaces": constants.Discord.String(),
+			},
+		},
+	}
 
 	updatedResult, err := r.collection.UpdateOne(ctx, filter, update)
 
@@ -204,13 +223,21 @@ func (r *userRepository) UpdateTelegramNumber(userId string, telegramNumber stri
 	defer cancel()
 
 	filter := bson.M{"userId": userId}
-	update := bson.D{{
-		Key: "$set",
-		Value: bson.M{
-			"telegramNumber": telegramNumber,
-			"updatedAt":      time.Now().UTC(),
+	update := bson.D{
+		{
+			Key: "$set",
+			Value: bson.M{
+				"telegramNumber": telegramNumber,
+				"updatedAt":      time.Now().UTC(),
+			},
 		},
-	}}
+		{
+			Key: "$addToSet",
+			Value: bson.M{
+				"notificationInterfaces": constants.Telegram.String(),
+			},
+		},
+	}
 
 	updatedResult, err := r.collection.UpdateOne(ctx, filter, update)
 
@@ -292,28 +319,74 @@ func (r *userRepository) FindNotificationInterfaces(userId string) ([]string, er
 
 }
 
-func (r *userRepository) UpdateFCMtokens(userId string, FCMtokens []string) error {
+func (r *userRepository) InsertFCMtoken(userId string, FCMtoken string) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	filter := bson.M{"userId": userId}
-	update := bson.D{{
-		Key: "$set",
-		Value: bson.M{
-			"FCMtokens": FCMtokens,
-			"updatedAt": time.Now().UTC(),
+	update := bson.D{
+		{
+			Key: "$set",
+			Value: bson.M{
+				"updatedAt": time.Now().UTC(),
+			},
 		},
-	}}
+		{
+			Key: "$addToSet",
+			Value: bson.M{
+				"FCMtokens": FCMtoken,
+			},
+		},
+		{
+			Key: "$addToSet",
+			Value: bson.M{
+				"notificationInterfaces": constants.UI.String(),
+			},
+		},
+	}
 
 	updatedResult, err := r.collection.UpdateOne(ctx, filter, update)
 
 	if err != nil {
-		slog.Error("Failed to update WhatsApp number", "error", err, "userId", userId, "FCMtokens", FCMtokens)
+		slog.Error("Failed to insert FCM token", "error", err, "userId", userId, "FCMtoken", FCMtoken)
 		return err
 	}
 
-	slog.Debug("Updated WhatsApp number", "userId", userId, "FCMtokens", FCMtokens, "updatedResult", updatedResult)
+	slog.Debug("Inserted FCM token", "userId", userId, "FCMtoken", FCMtoken, "updatedResult", updatedResult)
+	return nil
+
+}
+
+func (r *userRepository) RemoveFCMtoken(userId string, FCMtoken string) error {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	filter := bson.M{"userId": userId}
+	update := bson.D{
+		{
+			Key: "$set",
+			Value: bson.M{
+				"updatedAt": time.Now().UTC(),
+			},
+		},
+		{
+			Key: "$pull",
+			Value: bson.M{
+				"FCMtokens": FCMtoken,
+			},
+		},
+	}
+
+	updatedResult, err := r.collection.UpdateOne(ctx, filter, update)
+
+	if err != nil {
+		slog.Error("Failed to remove FCM token", "error", err, "userId", userId, "FCMtoken", FCMtoken)
+		return err
+	}
+
+	slog.Debug("Removed FCM token", "userId", userId, "FCMtoken", FCMtoken, "updatedResult", updatedResult)
 	return nil
 
 }
@@ -345,13 +418,21 @@ func (r *userRepository) UpdateWebhooks(userId string, webhooks []string) error 
 	defer cancel()
 
 	filter := bson.M{"userId": userId}
-	update := bson.D{{
-		Key: "$set",
-		Value: bson.M{
-			"webhooks":  webhooks,
-			"updatedAt": time.Now().UTC(),
+	update := bson.D{
+		{
+			Key: "$set",
+			Value: bson.M{
+				"webhooks":  webhooks,
+				"updatedAt": time.Now().UTC(),
+			},
 		},
-	}}
+		{
+			Key: "$addToSet",
+			Value: bson.M{
+				"notificationInterfaces": constants.Webhooks.String(),
+			},
+		},
+	}
 
 	updatedResult, err := r.collection.UpdateOne(ctx, filter, update)
 

@@ -5,7 +5,7 @@ type NotificationInterface string
 const (
 	UI       NotificationInterface = "ui"
 	Email    NotificationInterface = "email"
-	Whatsapp NotificationInterface = "whatsapp"
+	WhatsApp NotificationInterface = "whatsapp"
 	Discord  NotificationInterface = "discord"
 	Telegram NotificationInterface = "telegram"
 	Webhooks NotificationInterface = "webhooks"
@@ -16,7 +16,7 @@ func (r NotificationInterface) String() string {
 }
 
 func GetNotificationInterfaces() [4]NotificationInterface {
-	return [...]NotificationInterface{Email, UI, Whatsapp, Discord}
+	return [...]NotificationInterface{Email, UI, WhatsApp, Discord}
 }
 
 func GetNotificationInterfaceSet() map[NotificationInterface]struct{} {

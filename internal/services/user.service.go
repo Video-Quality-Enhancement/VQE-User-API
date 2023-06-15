@@ -1,6 +1,7 @@
 package services
 
 import (
+	"github.com/Video-Quality-Enhancement/VQE-User-API/internal/constants"
 	"github.com/Video-Quality-Enhancement/VQE-User-API/internal/models"
 	"github.com/Video-Quality-Enhancement/VQE-User-API/internal/producers"
 	"github.com/Video-Quality-Enhancement/VQE-User-API/internal/repositories"
@@ -24,7 +25,8 @@ type UserService interface {
 	EditNotificationInterfaces(userId string, notificationInterfaces []string) error
 	GetNotificationInterfaces(userId string) ([]string, error)
 
-	EditFCMtokens(userId string, FCMtokens []string) error
+	AddFCMtoken(userId string, FCMtoken string) error
+	DeleteFCMtoken(userId string, FCMtoken string) error
 	GetFCMtokens(userId string) ([]string, error)
 
 	EditWebhooks(userId string, webhooks []string) error
@@ -49,6 +51,9 @@ func (s *userService) UpsertUser(userId string) (bool, error) {
 
 	user := &models.User{
 		UserId: userId,
+		NotificationInterfaces: []string{
+			constants.Email.String(),
+		},
 	}
 	isUpserted, err := s.userRepository.Upsert(user)
 	if err != nil {
@@ -186,15 +191,28 @@ func (s *userService) GetNotificationInterfaces(userId string) ([]string, error)
 
 }
 
-func (s *userService) EditFCMtokens(userId string, FCMtokens []string) error {
+func (s *userService) AddFCMtoken(userId string, FCMtoken string) error {
 
-	err := s.userRepository.UpdateFCMtokens(userId, FCMtokens)
+	err := s.userRepository.InsertFCMtoken(userId, FCMtoken)
 	if err != nil {
-		slog.Error("Failed to edit FCM tokens", "error", err, "userId", userId, "FCMtokens", FCMtokens)
+		slog.Error("Failed to add FCM token", "error", err, "userId", userId, "FCMtoken", FCMtoken)
 		return err
 	}
 
-	slog.Debug("Edited FCM tokens", "userId", userId, "FCMtokens", FCMtokens)
+	slog.Debug("Added FCM token", "userId", userId, "FCMtoken", FCMtoken)
+	return nil
+
+}
+
+func (s *userService) DeleteFCMtoken(userId string, FCMtoken string) error {
+
+	err := s.userRepository.RemoveFCMtoken(userId, FCMtoken)
+	if err != nil {
+		slog.Error("Failed to delete FCM token", "error", err, "userId", userId, "FCMtoken", FCMtoken)
+		return err
+	}
+
+	slog.Debug("Deleted FCM token", "userId", userId, "FCMtoken", FCMtoken)
 	return nil
 
 }

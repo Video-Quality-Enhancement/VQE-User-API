@@ -33,7 +33,8 @@ func RegisterUserRoutes(router *gin.RouterGroup, authorization gin.HandlerFunc, 
 	router.PUT("/notificationInterfaces", controller.EditNotificationInterfaces)
 	router.GET("/notificationInterfaces", controller.GetNotificationInterfaces)
 
-	router.PUT("/fcmTokens", controller.EditFCMtokens)
+	router.PUT("/fcmTokens", controller.AddFCMtoken)
+	router.DELETE("/fcmTokens", controller.DeleteFCMtoken)
 	router.GET("/fcmTokens", controller.GetFCMtokens)
 
 	router.PUT("/webhooks", controller.EditWebhooks)

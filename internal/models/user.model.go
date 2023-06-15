@@ -30,8 +30,12 @@ type NotificationInterfacesRequest struct {
 	NotificationInterfaces []string `json:"notificationInterfaces" bson:"notificationInterfaces" binding:"required,are-notification-interfaces-valid"`
 }
 
+type FCMtokenRequest struct {
+	FCMtoken string `json:"FCMtoken" bson:"FCMtoken" binding:"required"`
+}
+
 type FCMtokensRequest struct {
-	FCMtokens []string `json:"FCMtokens" bson:"FCMtokens" binding:"required"`
+	FCMtokens []string `json:"FCMtokens" bson:"FCMtokens"`
 }
 
 type WebhooksRequest struct {
