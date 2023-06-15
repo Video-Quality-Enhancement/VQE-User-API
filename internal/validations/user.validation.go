@@ -25,16 +25,16 @@ func ValidateWebhooks(fl validator.FieldLevel) bool {
 	for _, webhook := range webhooks {
 
 		// Create a new request
-		req, err := http.NewRequest("POST", webhook, nil)
+		req, err := http.NewRequest("GET", webhook, nil)
 		if err != nil {
-			slog.Error("Invalid webhook", "webhook", webhook)
+			slog.Error("Couldn't create http request", "webhook", webhook)
 			return false
 		}
 
 		// Send the request
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
-			slog.Error("Invalid webhook", "webhook", webhook)
+			slog.Error("Couldn't send the http request", "webhook", webhook)
 			return false
 		}
 

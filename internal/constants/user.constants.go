@@ -15,8 +15,8 @@ func (r NotificationInterface) String() string {
 	return string(r)
 }
 
-func GetNotificationInterfaces() [4]NotificationInterface {
-	return [...]NotificationInterface{Email, UI, WhatsApp, Discord}
+func GetNotificationInterfaces() [6]NotificationInterface {
+	return [...]NotificationInterface{Email, UI, WhatsApp, Discord, Telegram, Webhooks}
 }
 
 func GetNotificationInterfaceSet() map[NotificationInterface]struct{} {
