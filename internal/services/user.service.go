@@ -9,7 +9,7 @@ import (
 
 type UserService interface {
 	UpsertUser(userId string) (bool, error)
-	GetByUserId(userId string) (*models.User, error)
+	GetUser(userId string) (*models.User, error)
 	EditWhatsAppNumber(userId string, whatsAppNumber string) error
 	EditDiscordId(userId string, discordId string) error
 	EditTelegramNumber(userId string, telegramNumber string) error
@@ -55,7 +55,7 @@ func (s *userService) UpsertUser(userId string) (bool, error) {
 
 }
 
-func (s *userService) GetByUserId(userId string) (*models.User, error) {
+func (s *userService) GetUser(userId string) (*models.User, error) {
 
 	user, err := s.userRepository.FindByUserId(userId)
 	if err != nil {
