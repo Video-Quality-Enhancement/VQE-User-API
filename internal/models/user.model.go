@@ -15,7 +15,7 @@ type User struct {
 }
 
 type WhatsAppRequest struct {
-	WhatsAppNumber string `json:"whatsAppNumber" bson:"whatsAppNumber" binding:"required"`
+	WhatsAppNumber string `json:"whatsAppNumber" bson:"whatsAppNumber" binding:"required,e164"`
 }
 
 type DiscordRequest struct {
@@ -23,11 +23,11 @@ type DiscordRequest struct {
 }
 
 type TelegramRequest struct {
-	TelegramNumber string `json:"telegramNumber" bson:"telegramNumber" binding:"required"`
+	TelegramNumber string `json:"telegramNumber" bson:"telegramNumber" binding:"required,e164"`
 }
 
 type NotificationInterfacesRequest struct {
-	NotificationInterfaces []string `json:"notificationInterfaces" bson:"notificationInterfaces" binding:"required"`
+	NotificationInterfaces []string `json:"notificationInterfaces" bson:"notificationInterfaces" binding:"required,are-notification-interfaces-valid"`
 }
 
 type FCMtokensRequest struct {
@@ -35,5 +35,5 @@ type FCMtokensRequest struct {
 }
 
 type WebhooksRequest struct {
-	Webhooks []string `json:"webhooks" bson:"webhooks" binding:"required"`
+	Webhooks []string `json:"webhooks" bson:"webhooks" binding:"required,url[]"`
 }
