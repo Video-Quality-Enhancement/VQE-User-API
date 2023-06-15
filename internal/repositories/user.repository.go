@@ -13,13 +13,27 @@ import (
 
 type UserRepository interface {
 	Upsert(user *models.User) (bool, error)
+
 	FindByUserId(userId string) (*models.User, error)
+
 	UpdateWhatsAppNumber(userId string, whatsAppNumber string) error
+	FindWhatsAppNumber(userId string) (string, error)
+
 	UpdateDiscordId(userId string, discordId string) error
+	FindDiscordId(userId string) (string, error)
+
 	UpdateTelegramNumber(userId string, telegramNumber string) error
+	FindTelegramNumber(userId string) (string, error)
+
 	UpdateNotificationInterfaces(userId string, notificationInterfaces []string) error
+	FindNotificationInterfaces(userId string) ([]string, error)
+
 	UpdateFCMtokens(userId string, FCMtokens []string) error
+	FindFCMtokens(userId string) ([]string, error)
+
 	UpdateWebhooks(userId string, webhooks []string) error
+	FindWebhooks(userId string) ([]string, error)
+
 	Delete(userId string) error
 }
 
@@ -111,6 +125,25 @@ func (r *userRepository) UpdateWhatsAppNumber(userId string, whatsAppNumber stri
 	return nil
 }
 
+func (r *userRepository) FindWhatsAppNumber(userId string) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	filter := bson.M{"userId": userId}
+	opts := options.FindOne().SetProjection(bson.M{"whatsAppNumber": 1})
+
+	var user models.User
+	err := r.collection.FindOne(ctx, filter, opts).Decode(&user)
+
+	if err != nil {
+		slog.Error("Failed to find WhatsApp number", "error", err, "userId", userId)
+		return "", err
+	}
+
+	slog.Debug("Found WhatsApp number", "userId", userId, "whatsAppNumber", user.WhatsAppNumber)
+	return user.WhatsAppNumber, nil
+}
+
 func (r *userRepository) UpdateDiscordId(userId string, discordId string) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -136,6 +169,25 @@ func (r *userRepository) UpdateDiscordId(userId string, discordId string) error 
 	return nil
 }
 
+func (r *userRepository) FindDiscordId(userId string) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	filter := bson.M{"userId": userId}
+	opts := options.FindOne().SetProjection(bson.M{"discordId": 1})
+
+	var user models.User
+	err := r.collection.FindOne(ctx, filter, opts).Decode(&user)
+
+	if err != nil {
+		slog.Error("Failed to find Discord ID", "error", err, "userId", userId)
+		return "", err
+	}
+
+	slog.Debug("Found Discord ID", "userId", userId, "discordId", user.DiscordId)
+	return user.DiscordId, nil
+}
+
 func (r *userRepository) UpdateTelegramNumber(userId string, telegramNumber string) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -159,6 +211,27 @@ func (r *userRepository) UpdateTelegramNumber(userId string, telegramNumber stri
 
 	slog.Debug("Updated WhatsApp number", "userId", userId, "telegramNumber", telegramNumber, "updatedResult", updatedResult)
 	return nil
+
+}
+
+func (r *userRepository) FindTelegramNumber(userId string) (string, error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	filter := bson.M{"userId": userId}
+	opts := options.FindOne().SetProjection(bson.M{"telegramNumber": 1})
+
+	var user models.User
+	err := r.collection.FindOne(ctx, filter, opts).Decode(&user)
+
+	if err != nil {
+		slog.Error("Failed to find Telegram number", "error", err, "userId", userId)
+		return "", err
+	}
+
+	slog.Debug("Found Telegram number", "userId", userId, "telegramNumber", user.TelegramNumber)
+	return user.TelegramNumber, nil
 
 }
 
@@ -188,6 +261,27 @@ func (r *userRepository) UpdateNotificationInterfaces(userId string, notificatio
 
 }
 
+func (r *userRepository) FindNotificationInterfaces(userId string) ([]string, error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	filter := bson.M{"userId": userId}
+	opts := options.FindOne().SetProjection(bson.M{"notificationInterfaces": 1})
+
+	var user models.User
+	err := r.collection.FindOne(ctx, filter, opts).Decode(&user)
+
+	if err != nil {
+		slog.Error("Failed to find Notification Interfaces", "error", err, "userId", userId)
+		return nil, err
+	}
+
+	slog.Debug("Found Notification Interfaces", "userId", userId, "notificationInterfaces", user.NotificationInterfaces)
+	return user.NotificationInterfaces, nil
+
+}
+
 func (r *userRepository) UpdateFCMtokens(userId string, FCMtokens []string) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -214,6 +308,27 @@ func (r *userRepository) UpdateFCMtokens(userId string, FCMtokens []string) erro
 
 }
 
+func (r *userRepository) FindFCMtokens(userId string) ([]string, error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	filter := bson.M{"userId": userId}
+	opts := options.FindOne().SetProjection(bson.M{"FCMtokens": 1})
+
+	var user models.User
+	err := r.collection.FindOne(ctx, filter, opts).Decode(&user)
+
+	if err != nil {
+		slog.Error("Failed to find FCM tokens", "error", err, "userId", userId)
+		return nil, err
+	}
+
+	slog.Debug("Found FCM tokens", "userId", userId, "FCMtokens", user.FCMtokens)
+	return user.FCMtokens, nil
+
+}
+
 func (r *userRepository) UpdateWebhooks(userId string, webhooks []string) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -237,6 +352,27 @@ func (r *userRepository) UpdateWebhooks(userId string, webhooks []string) error 
 
 	slog.Debug("Updated WhatsApp number", "userId", userId, "webhooks", webhooks, "updatedResult", updatedResult)
 	return nil
+
+}
+
+func (r *userRepository) FindWebhooks(userId string) ([]string, error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	filter := bson.M{"userId": userId}
+	opts := options.FindOne().SetProjection(bson.M{"webhooks": 1})
+
+	var user models.User
+	err := r.collection.FindOne(ctx, filter, opts).Decode(&user)
+
+	if err != nil {
+		slog.Error("Failed to find Webhooks", "error", err, "userId", userId)
+		return nil, err
+	}
+
+	slog.Debug("Found Webhooks", "userId", userId, "webhooks", user.Webhooks)
+	return user.Webhooks, nil
 
 }
 
