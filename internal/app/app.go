@@ -14,6 +14,12 @@ func SetUpApp(router *gin.Engine, database *mongo.Database, conn config.AMQPconn
 	userRouter := router.Group("/api/user")
 
 	SetUpUser(userRouter, collection, conn, firebaseClient)
-	// SetUpUserVideo(userVideoRouter, collection, conn, firebaseClient)
+
+}
+
+func SetUpRepositoryIndexes(database *mongo.Database) {
+
+	collection := database.Collection(os.Getenv("USER_COLLECTION"))
+	SetUpUserRepositoryIndexes(collection)
 
 }

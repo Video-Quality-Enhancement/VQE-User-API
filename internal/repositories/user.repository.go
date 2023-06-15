@@ -37,11 +37,21 @@ type UserRepository interface {
 	Delete(userId string) error
 }
 
+type UserRepositorySetup interface {
+	MakeUserIdUniqueIndex()
+}
+
 type userRepository struct {
 	collection *mongo.Collection
 }
 
 func NewUserRepository(collection *mongo.Collection) UserRepository {
+	return &userRepository{
+		collection: collection,
+	}
+}
+
+func NewUserRepositorySetup(collection *mongo.Collection) UserRepositorySetup {
 	return &userRepository{
 		collection: collection,
 	}
@@ -392,5 +402,27 @@ func (r *userRepository) Delete(userId string) error {
 
 	slog.Debug("Deleted", "userId", userId, "deletedResult", deletedResult)
 	return nil
+
+}
+
+func (r *userRepository) MakeUserIdUniqueIndex() {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	indexName, err := r.collection.Indexes().CreateOne(
+		ctx,
+		mongo.IndexModel{
+			Keys:    bson.D{{Key: "userId", Value: 1}},
+			Options: options.Index().SetUnique(true),
+		},
+	)
+
+	if err != nil {
+		slog.Error("Error creating userId index", "indexName", indexName)
+		panic(err)
+	}
+
+	slog.Debug("Created userId index", "indexName", indexName)
 
 }

@@ -22,7 +22,7 @@ func main() {
 	router := gin.New()
 	router.Use(middlewares.JSONlogger())
 	router.Use(gin.Recovery())
-	// ? router.MaxMultipartMemory = 8 << 20
+
 	configurations := cors.DefaultConfig()
 	configurations.AllowAllOrigins = true
 	configurations.AllowCredentials = true
@@ -30,7 +30,6 @@ func main() {
 	configurations.AllowHeaders = []string{"Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization", "Accept", "Origin", "Cache-Control", "X-Requested-With"}
 	configurations.ExposeHeaders = []string{"Content-Length"}
 	router.Use(cors.New(configurations))
-	// router.Use(CORSMiddleware())
 
 	client := config.NewMongoClient()
 	database := client.ConnectToDB()
