@@ -5,7 +5,7 @@ import "time"
 type User struct {
 	UserId                 string    `json:"userId" bson:"userId"`
 	NotificationInterfaces []string  `json:"notificationInterfaces,omitempty" bson:"notificationInterfaces,omitempty"`
-	FCMtokens              []string  `json:"FCMtokens,omitempty" bson:"FCMtokens,omitempty"`
+	FCMtokens              []string  `json:"fcmTokens,omitempty" bson:"fcmTokens,omitempty"`
 	WhatsAppNumber         string    `json:"whatsAppNumber,omitempty" bson:"whatsAppNumber,omitempty"`
 	DiscordId              string    `json:"discordId,omitempty" bson:"discordId,omitempty"`
 	TelegramNumber         string    `json:"telegramNumber,omitempty" bson:"telegramNumber,omitempty"`
@@ -31,11 +31,11 @@ type NotificationInterfacesRequest struct {
 }
 
 type FCMtokenRequest struct {
-	FCMtoken string `json:"FCMtoken" bson:"FCMtoken" binding:"required"`
+	FCMtoken string `json:"fcmTokens" bson:"fcmTokens" binding:"required"`
 }
 
 type FCMtokensRequest struct {
-	FCMtokens []string `json:"FCMtokens" bson:"FCMtokens"`
+	FCMtokens []string `json:"fcmTokens" bson:"fcmTokens"`
 }
 
 type WebhooksRequest struct {
